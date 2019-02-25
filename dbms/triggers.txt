@@ -1,0 +1,43 @@
+delimiter //
+CREATE TRIGGER deposit_tran_trigger
+before UPDATE ON deposit_account
+FOR EACH ROW
+BEGIN
+DECLARE amt int ;
+SET amt=new.amount_deposted - old.amount_deposted ;
+INSERT INTO deposit_transaction(account_no, date, amount) VALUES (old.account_no,CURRENT_DATE,amt);
+END; //
+delimiter ;
+
+UPDATE `deposit_account` SET `amount_deposted`= 9000 WHERE account_no=555;
+
+
+delimiter //
+CREATE TRIGGER loan_tran_trigger
+BEFORE UPDATE ON loan_ongoing
+FOR EACH ROW
+BEGIN
+DECLARE amt int ;
+SET amt = old.amount_remaining - new.amount_remaining ;
+INSERT INTO deposit_transaction (date, loan_no, amount) VALUES (CURRENT_DATE, old.loan_no, amt);
+END; //
+delimiter ;
+ 
+UPDATE `loan_ongoing` SET `amount_remaining` = 45 WHERE`loan_no` = 895 ;
+
+
+delimiter //
+CREATE TRIGGER loan_transfer
+AFTER INSERT ON loan_ongoing
+FOR EACH ROW
+BEGIN
+DECLARE final int;
+DECLARE amt int;
+SELECT amount_deposted INTO amt FROM deposit_account WHERE account_no = new.account_no;
+SET final = amt+new.amount_taken;
+UPDATE deposit_account SET amount_deposted = final
+WHERE account_no = new.account_no;
+END; //
+DELIMITER ;
+
+

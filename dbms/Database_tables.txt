@@ -1,0 +1,64 @@
+
+create table basic_user_details(
+	roll_no int NOT NULL unique,	
+	name varchar(50) NOT NULL,
+	mobile_no varchar(20) NOT NULL,
+	Primary key (roll_no)
+);
+
+
+create table deposit_account(
+	roll_no int NOT NULL,
+	account_no varchar(20) NOT NULL,
+	amount_deposted int,
+	password varchar(20) NOT NULL,
+	Primary key (account_no),
+	UNIQUE(account_no),
+	FOREIGN KEY (roll_no) REFERENCES basic_user_details(roll_no)
+);
+
+
+create table deposit_transaction(
+	dt_id int NOT NULL AUTO_INCREMENT,
+	account_no varchar(20) NOT NULL unique,
+	date date NOT NULL,
+	amount int NOT NULL,
+	Primary key (dt_id),
+	FOREIGN KEY (account_no) REFERENCES deposit_account(account_no)
+);
+
+
+create table loan_ongoing(
+	roll_no int NOT NULL,
+	loan_no varchar(20) NOT NULL,
+	password varchar(20) NOT NULL,
+	account_no varchar(20) NOT NULL,
+	amount_taken int NOT NULL,
+	amount_remaining int,
+	date_of_issue date NOT NULL,
+	total_loan_time int NOT NULL,
+	amount_paid int,
+	Primary Key (loan_no),
+	UNIQUE(loan_no),
+	FOREIGN KEY (roll_no) REFERENCES basic_user_details(roll_no),
+	FOREIGN KEY (account_no) REFERENCES deposit_account(account_no)	
+);
+
+
+create table loan_transaction(
+	lt_id int NOT NULL AUTO_INCREMENT,
+	date date NOT NULL,
+	loan_no varchar(20) NOT NULL,
+	amount int NOT NULL,
+	Primary key (lt_id),
+	FOREIGN KEY (loan_no) REFERENCES loan_ongoing(loan_no)
+);
+
+
+
+create table loan_status(
+	roll_no int NOT NULL unique,
+	status varchar(10) NOT NULL,
+	Primary Key (roll_no),
+	FOREIGN KEY (roll_no) REFERENCES basic_user_details(roll_no)
+);
